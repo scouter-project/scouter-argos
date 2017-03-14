@@ -1,3 +1,3 @@
 # argos
 
-arogs is mariadb agent for scouter.
+arogs is scouter agent for mysql/mariadb.
