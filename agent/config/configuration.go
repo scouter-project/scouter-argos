@@ -8,7 +8,8 @@ import (
 	"time"
 )
 
-type Configuration struct {
+// Configmgr is a object that manages configuration for argos.
+type Configmgr struct {
 	stopRunning chan bool
 }
 
@@ -18,18 +19,18 @@ var running = make(chan bool)
 var confFileModdTime time.Time
 var confFileSize int64
 
-type ConfObject struct {
-	Configurations Collector
+type configType struct {
+	Configurations collectorType
 }
 
-type Collector struct {
-	IP        string       `json:"collector.ip"`
-	Udpport   string       `json:"collector.udp.port"`
-	Tcpport   string       `json:"collector.tcp.port"`
-	Instances []DBInstance `json:"db.instances"`
+type collectorType struct {
+	CollectorIP string   `json:"collector.ip"`
+	Udpport     string   `json:"collector.udp.port"`
+	Tcpport     string   `json:"collector.tcp.port"`
+	Instances   []dbType `json:"db.instances"`
 }
 
-type DBInstance struct {
+type dbType struct {
 	IP        string `json:"db.ip"`
 	Port      string `json:"db.port"`
 	User      string `json:"db.user"`
@@ -37,8 +38,8 @@ type DBInstance struct {
 	Slowquery string `json:"db.slowquery"`
 }
 
-func (conf *Configuration) load() {
-	var confobj ConfObject
+func (conf *Configmgr) load() {
+	var config configType
 	fileInfo, e := confFile.Stat()
 	if e != nil {
 		//todo: error handling
@@ -49,14 +50,14 @@ func (conf *Configuration) load() {
 		if err != nil {
 			//todo :
 		}
-		json.Unmarshal(file, &confobj)
+		json.Unmarshal(file, &config)
 		confFileSize = fileInfo.Size()
 		confFileModdTime = fileInfo.ModTime()
 	}
 
 }
 
-func (conf *Configuration) init() bool {
+func (conf *Configmgr) init() bool {
 	f, err := os.Open(confFilePath)
 	if err != nil {
 		return false
@@ -66,15 +67,15 @@ func (conf *Configuration) init() bool {
 	return true
 }
 
-func (conf *Configuration) Start() {
+func (conf *Configmgr) Start() {
 	go conf.run()
 }
 
-func (conf *Configuration) Stop() {
+func (conf *Configmgr) Stop() {
 	conf.stopRunning <- true
 }
 
-func (conf *Configuration) run() {
+func (conf *Configmgr) run() {
 	for {
 		conf.load()
 		time.Sleep(1 * time.Second)
@@ -87,13 +88,13 @@ func (conf *Configuration) run() {
 	}
 }
 
-var configure *Configuration
+var configure *Configmgr
 var once sync.Once
 
 // GetInstance returns configuraton singleton instance
-func GetInstance() *Configuration {
+func GetInstance() *Configmgr {
 	once.Do(func() {
-		configure = &Configuration{}
+		configure = &Configmgr{}
 		if configure.init() {
 			configure.Start()
 		}
