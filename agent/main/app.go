@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -15,18 +16,13 @@ var pidfile string
 var f *os.File
 
 func main() {
-	if len(os.Args) > 1 {
-		readArgs(os.Args)
-	}
+	readArgs(os.Args)
 	start()
 
 }
 
 func start() {
 	displayLogo()
-	//workGroup.Add(1)
-	//var conf *config.Configuration
-	config.GetInstance()
 	manager.ServiceStart()
 	writePid()
 
@@ -78,10 +74,18 @@ func usage() {
 }
 
 func readArgs(args []string) {
-	for _, value := range args {
-		argsItem := strings.Split(value, "=")
-		if argsItem[0] == "scouter.config" {
-			config.ConfFilePath = argsItem[1]
+	if len(args) > 2 {
+		for _, value := range args {
+			argsItem := strings.Split(value, "=")
+			if argsItem[0] == "scouter.config" {
+				config.GetInstance().ConfFilePath = argsItem[1]
+			}
 		}
+	} else {
+		ex, err := os.Executable()
+		if err != nil {
+			panic(err)
+		}
+		config.GetInstance().ConfFilePath = path.Dir(ex) + "/conf/scouter.json"
 	}
 }

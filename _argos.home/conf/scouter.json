@@ -1,23 +1,21 @@
 { 
-    "configurations": {
-        "collector.ip": "127.0.0.1",
-        "collector.udp.port": "6100",
-        "collector.tcp.port": "6100",
-        "db.instances": [
-            {
-                "db.ip": "db addr",
-                "db.port": "3306",
-                "db.user": "user_name",
-                "db.password": "user_password",
-                "db.slowquery": "/path/to/slow_query"
-            },
-            {
-                "db.server": "db addr",
-                "db.port": "3308",
-                "db.user": "user_name",
-                "db.password": "user_password",
-                "db.slowquery": "/path/to/slow_query"
-            }
-        ]
-    }
+    "collector.ip": "127.0.0.1",
+    "collector.udp.port": "6100",
+    "collector.tcp.port": "6100",
+    "db.instances": [
+        {
+            "db.ip": "db addr",
+            "db.port": "3306",
+            "db.user": "user_name",
+            "db.password": "user_password",
+            "db.slowquery": "/path/to/slow_query"
+        },
+        {
+            "db.server": "db addr",
+            "db.port": "3308",
+            "db.user": "user_name",
+            "db.password": "user_password",
+            "db.slowquery": "/path/to/slow_query"
+        }
+    ]
 }

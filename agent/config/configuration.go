@@ -9,28 +9,26 @@ import (
 )
 
 // Configmgr is a object that manages configuration for argos.
-type Configmgr struct {
-	stopRunning chan bool
+type configManager struct {
+	stopRunning  chan bool
+	confFile     *os.File
+	Conf         *Config
+	ConfFilePath string
 }
 
-var confFilePath string
-var confFile *os.File
 var running = make(chan bool)
 var confFileModdTime time.Time
 var confFileSize int64
 
-type configType struct {
-	Configurations collectorType
+// Config is a struct represents configuration.
+type Config struct {
+	CollectorIP string       `json:"collector.ip"`
+	Udpport     string       `json:"collector.udp.port"`
+	Tcpport     string       `json:"collector.tcp.port"`
+	Instances   []dbInstance `json:"db.instances"`
 }
 
-type collectorType struct {
-	CollectorIP string   `json:"collector.ip"`
-	Udpport     string   `json:"collector.udp.port"`
-	Tcpport     string   `json:"collector.tcp.port"`
-	Instances   []dbType `json:"db.instances"`
-}
-
-type dbType struct {
+type dbInstance struct {
 	IP        string `json:"db.ip"`
 	Port      string `json:"db.port"`
 	User      string `json:"db.user"`
@@ -38,47 +36,54 @@ type dbType struct {
 	Slowquery string `json:"db.slowquery"`
 }
 
-func (conf *Configmgr) load() {
-	var config configType
-	fileInfo, e := confFile.Stat()
+func (conf *configManager) load() {
+	fileInfo, e := conf.confFile.Stat()
 	if e != nil {
 		//todo: error handling
 	}
 
 	if confFileModdTime != fileInfo.ModTime() || confFileSize != fileInfo.Size() {
-		file, err := ioutil.ReadFile(confFilePath)
+		file, err := ioutil.ReadFile(conf.ConfFilePath)
 		if err != nil {
 			//todo :
 		}
-		json.Unmarshal(file, &config)
+		json.Unmarshal(file, conf.Conf)
+		//fmt.Printf("server ip: %s", config.Configurations.CollectorIP)
 		confFileSize = fileInfo.Size()
 		confFileModdTime = fileInfo.ModTime()
 	}
 
 }
 
-func (conf *Configmgr) init() bool {
-	f, err := os.Open(confFilePath)
+func (conf *configManager) ReadConfig() {
+	if conf.initialize() {
+		conf.load()
+	}
+}
+
+func (conf *configManager) initialize() bool {
+	f, err := os.Open(conf.ConfFilePath)
 	if err != nil {
 		return false
-	} else {
-		confFile = f
 	}
+	conf.confFile = f
 	return true
 }
 
-func (conf *Configmgr) Start() {
-	go conf.run()
+// Start is a method for reading configuraton.
+func (conf *configManager) Start() {
+	go run(conf)
 }
 
-func (conf *Configmgr) Stop() {
+// Stop is a method for stopping read configuration.
+func (conf *configManager) Stop() {
 	conf.stopRunning <- true
 }
 
-func (conf *Configmgr) run() {
+func run(conf *configManager) {
 	for {
-		conf.load()
 		time.Sleep(1 * time.Second)
+		conf.load()
 		select {
 		case <-conf.stopRunning:
 			break
@@ -88,16 +93,15 @@ func (conf *Configmgr) run() {
 	}
 }
 
-var configure *Configmgr
+var configure *configManager
 var once sync.Once
 
 // GetInstance returns configuraton singleton instance
-func GetInstance() *Configmgr {
+func GetInstance() *configManager {
 	once.Do(func() {
-		configure = &Configmgr{}
-		if configure.init() {
-			configure.Start()
-		}
+		configure = &configManager{}
+		configure.Conf = &Config{}
+
 	})
 	return configure
 }
