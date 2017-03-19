@@ -6,6 +6,8 @@ import (
 	"os"
 	"sync"
 	"time"
+
+	"github.com/scouter-argos/agent/instance"
 )
 
 // Configmgr is a object that manages configuration for argos.
@@ -22,18 +24,10 @@ var confFileSize int64
 
 // Config is a struct represents configuration.
 type Config struct {
-	CollectorIP string       `json:"collector.ip"`
-	Udpport     string       `json:"collector.udp.port"`
-	Tcpport     string       `json:"collector.tcp.port"`
-	Instances   []dbInstance `json:"db.instances"`
-}
-
-type dbInstance struct {
-	IP        string `json:"db.ip"`
-	Port      string `json:"db.port"`
-	User      string `json:"db.user"`
-	Password  string `json:"db.password"`
-	Slowquery string `json:"db.slowquery"`
+	CollectorIP string              `json:"collector.ip"`
+	Udpport     string              `json:"collector.udp.port"`
+	Tcpport     string              `json:"collector.tcp.port"`
+	Instances   []instance.Instance `json:"db.instances"`
 }
 
 func (conf *configManager) load() {
