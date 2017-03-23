@@ -5,7 +5,7 @@ import (
 	"github.com/scouter-argos/agent/instance"
 )
 
-// DBInstances is a slice that has a db instance
+// DBInstances is a slice that has a db instance. 
 var DBInstances []*instance.Instance
 
 // ServiceStart is a function which starts monitoring service.
