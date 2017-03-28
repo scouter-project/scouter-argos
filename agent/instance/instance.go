@@ -1,5 +1,8 @@
 package instance
-
+import ( "fmt"
+		 "database/sql"
+		  _ "github.com/go-sql-driver/mysql" 
+) 
 type Instance struct {
 	Type      string `json:"db.type"`
 	IP        string `json:"db.ip"`
@@ -10,5 +13,5 @@ type Instance struct {
 }
 
 func (*Instance) StartMonitor() {
-
+	
 }
