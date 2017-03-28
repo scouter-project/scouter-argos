@@ -4,6 +4,7 @@
     "collector.tcp.port": "6100",
     "db.instances": [
         {
+            "db.type" : "mariadb",
             "db.ip": "db addr",
             "db.port": "3306",
             "db.user": "user_name",
@@ -11,6 +12,7 @@
             "db.slowquery": "/path/to/slow_query"
         },
         {
+            "db.type" : "mysql",
             "db.server": "db addr",
             "db.port": "3308",
             "db.user": "user_name",
