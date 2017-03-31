@@ -1,8 +1,12 @@
 package instance
-import ( "fmt"
-		 "database/sql"
-		  _ "github.com/go-sql-driver/mysql" 
-) 
+
+import (
+	"database/sql"
+	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
 type Instance struct {
 	Type      string `json:"db.type"`
 	IP        string `json:"db.ip"`
@@ -12,6 +16,13 @@ type Instance struct {
 	Slowquery string `json:"db.slowquery"`
 }
 
-func (*Instance) StartMonitor() {
-	
+func (inst *Instance) StartMonitor() {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", inst.User, inst.Password, inst.IP, inst.Port, "mysql")
+
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
+
 }
