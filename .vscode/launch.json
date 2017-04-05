@@ -9,7 +9,7 @@
             "remotePath": "",
             "port": 2345,
             "host": "127.0.0.1",
-            "program":"/Users/windfree/workspace/ws.go/src/github.com/scouter-argos/agent/main/app.go"
+            "program":"/Users/windfree/workspace/ws.go/src/github.com/scouter-argos/agent/main/app.go",
             "env": {},
             "args": ["scouter.config=/Users/windfree/workspace/ws.go/src/github.com/scouter-argos/_argos.home/conf/scouter.json"],
             "showLog": true
