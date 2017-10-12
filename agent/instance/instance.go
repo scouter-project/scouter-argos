@@ -15,6 +15,7 @@ type Instance struct {
 	User      string `json:"db.user"`
 	Password  string `json:"db.password"`
 	Slowquery string `json:"db.slowquery"`
+	
 }
 
 func (inst *Instance) StartMonitor() {
@@ -35,6 +36,9 @@ func (inst *Instance) StartMonitor() {
 }
 
 func (inst *Instance) run() {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	ch := make(chan int)
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", inst.User, inst.Password, inst.IP, inst.Port, "mysql")
 	db, err := sql.Open("mysql", dsn) //// Open doesn't open a connection. Validate DSN data
 	if err != nil {
@@ -49,12 +53,16 @@ func (inst *Instance) run() {
 
 		var statusName string
 		var statusValue int64
+		
+		statusMap := make(map[string] int64)
 		for resultRow.Next() {
+
 			// get RawBytes from data
 			err = resultRow.Scan(&statusName, &statusValue)
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
+			map[statusName]= statusValue
 
 		}
 	}
